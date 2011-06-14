@@ -10,7 +10,7 @@
 <div class="about">
   {if isset($img_url)}
   <div class="about_logo">
-    <img src="{$img_url}" width="400" height="267" alt="kitPoll" />
+    <img src="{$img_url}" width="425" height="350" alt="kitPoll" />
   </div>
   {/if}
   <div class="about_text">

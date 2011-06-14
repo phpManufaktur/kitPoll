@@ -8,6 +8,10 @@
  * @version $Id$
  */
 
+@import "include/jquery/themes/smoothness/ui.base.css";
+@import "include/jquery/themes/smoothness/ui.theme.css";
+@import "include/jquery/themes/smoothness/ui.datepicker.css";
+
 td
 {
   font-size: 8pt;

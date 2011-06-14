@@ -1,0 +1,54 @@
+{*
+ kitPoll
+ 
+ @author Ralf Hertsch (ralf.hertsch@phpmanufaktur.de)
+ @link http://phpmanufaktur.de
+ @copyright 2011
+ @license GNU GPL (http://www.gnu.org/licenses/gpl.html)
+ @version $Id$
+
+ Es stehen folgende Parameter zur Verfügung:
+ 
+ $poll.id
+ $poll.name
+ $poll.header
+ $poll.question
+ $poll.access
+ $poll.date_start
+ $poll.date_end
+ $poll.status
+ $poll.show_results
+ $poll.release
+ $poll.timestamp
+ $poll.clicks
+ $poll.link_edit
+  			
+ Analog dazu stehen die Kopfzeilen $header für die Tabellenüberschriften zur Verfügung.
+ 
+*}
+<table width="100%">
+  <colgroup>
+    <col width="40" />
+    <col width="100" />
+    <col width="*" />
+    <col width="100" />
+  </colgroup>
+  <thead>
+    <tr>
+      <th>{$header.id}</th>
+      <th>{$header.name}</th>
+      <th>{$header.header}</th>
+      <th>{$header.clicks}</th>
+    </tr>
+  </thead>
+  <tbody>
+    {foreach $polls poll}
+    <tr>
+      <td><a href="{$poll.link_edit}">{string_format($poll.id, '%05d')}</a></td>
+      <td>{$poll.name}</td>
+      <td>{$poll.header}</td>
+      <td>{$poll.clicks}</td>
+    </tr>
+    {/foreach}
+  </tbody>
+</table>
