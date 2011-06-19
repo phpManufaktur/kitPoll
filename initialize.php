@@ -48,6 +48,11 @@ global $parser;
 if (!is_object($kitLibrary)) $kitLibrary = new kitToolsLibrary();
 if (!is_object($parser)) $parser = new Dwoo();
 
+// Connect with DropletsExtension Interface
+if (file_exists(WB_PATH.'/modules/droplets_extension/interface.php')) {
+  require_once(WB_PATH.'/modules/droplets_extension/interface.php');
+}
+
 require_once(WB_PATH .'/modules/'.basename(dirname(__FILE__)).'/class.poll.php');
 
 ?>

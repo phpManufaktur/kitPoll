@@ -26,6 +26,9 @@
  Analog dazu stehen die Kopfzeilen $header für die Tabellenüberschriften zur Verfügung.
  
 *}
+<h2>{$title}</h2>
+<div class="{if $is_intro==1}intro{else}message{/if}">{$intro}</div>
+  
 <table width="100%">
   <colgroup>
     <col width="40" />
@@ -52,3 +55,6 @@
     {/foreach}
   </tbody>
 </table>
+<div class="poll_export_link">
+  <a href="{$export_link}">{$export_text}</a>
+</div>

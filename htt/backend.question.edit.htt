@@ -124,6 +124,18 @@
         <td>{$poll.kit_groups.hint}</td>
       </tr>
       <tr>
+        <td>{$poll.answers_mode.label}</td>
+        <td>
+          <select name="{$poll.answers_mode.name}">
+            {foreach $poll.answers_mode.options option}
+            <option value="{$option.key}"{if $option.key == $poll.answers_mode.active} selected="selected"{/if}>{$option.value}</option>
+            {/foreach}
+          </select>
+        </td>
+        <td>{$poll.answers_mode.hint}</td>
+      </tr>
+      {* VORGESEHEN, ABER NOCH NICHT AKTIV...
+      <tr>
         <td>{$poll.date_start.label}</td>
         <td><input type="text" id="datepicker_1" name="{$poll.date_start.name}" value="{date_format($poll.date_start.value, '%d.%m.%Y')}" /></td>
         <td>{$poll.date_start.hint}</td>
@@ -133,6 +145,7 @@
         <td><input type="text" id="datepicker_2" name="{$poll.date_end.name}" value="{date_format($poll.date_end.value, '%d.%m.%Y')}" /></td>
         <td>{$poll.date_end.hint}</td>
       </tr>
+      *}
       <tr>
         <td>{$poll.show_results.label}</td>
         <td>

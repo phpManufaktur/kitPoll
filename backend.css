@@ -175,3 +175,8 @@ textarea
 .about_text p {
   line-height: 120%;
 }
+.poll_export_link {
+  margin: 20px 0 0 0;
+  text-align: center;
+  font-size: 8pt;
+}
