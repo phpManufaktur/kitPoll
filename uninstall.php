@@ -37,7 +37,7 @@ require_once(WB_PATH.'/modules/kit_poll/class.poll.php');
 
 global $admin;
 
-$tables = array('dbPollQuestion', 'dbPollAnswer', 'dbPollLog', 'dbPollTableSort');
+$tables = array('dbPollQuestion', 'dbPollAnswer', 'dbPollLog', 'dbPollTableSort', 'dbPollCfg');
 $error = '';
 
 foreach ($tables as $table) {

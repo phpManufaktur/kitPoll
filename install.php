@@ -35,7 +35,7 @@ require_once(WB_PATH.'/modules/kit_poll/class.poll.php');
 
 global $admin;
 
-$tables = array('dbPollQuestion', 'dbPollAnswer', 'dbPollLog', 'dbPollTableSort');
+$tables = array('dbPollQuestion', 'dbPollAnswer', 'dbPollLog', 'dbPollTableSort', 'dbPollCfg');
 $error = '';
 
 foreach ($tables as $table) {
@@ -47,7 +47,7 @@ foreach ($tables as $table) {
 		}
 	}
 }
-/*
+
 // Install Droplets
 $droplets = new checkDroplets();
 $droplets->droplet_path = WB_PATH.'/modules/kit_poll/droplets/';
@@ -61,7 +61,7 @@ else {
 if ($message != "") {
   echo '<script language="javascript">alert ("'.$message.'");</script>';
 }
-*/
+
 
 // Prompt Errors
 if (!empty($error)) {
