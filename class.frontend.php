@@ -588,8 +588,8 @@ class pollFrontend {
 		
 		$form = new formFrontend();
 		$params = $form->getParams();
-		$params[formFrontend::param_form] = $dlg;
-		$params[formFrontend::param_return] = true;
+		$params['form'] = $dlg;
+		$params['return'] = true;
 		$form->setParams($params);
 		
 		$result = $form->action();
