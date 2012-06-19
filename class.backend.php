@@ -1,16 +1,35 @@
 <?php
+
 /**
  * kitPoll
- * 
- * @author Ralf Hertsch (ralf.hertsch@phpmanufaktur.de)
+ *
+ * @author Ralf Hertsch <ralf.hertsch@phpmanufaktur.de>
  * @link http://phpmanufaktur.de
- * @copyright 2011
- * @license GNU GPL (http://www.gnu.org/licenses/gpl.html)
- * @version $Id$
+ * @copyright 2011 - 2012
+ * @license MIT License (MIT) http://www.opensource.org/licenses/MIT
  */
 
-// prevent this file from being accessed directly
-if (!defined('WB_PATH')) die('invalid call of '.$_SERVER['SCRIPT_NAME']);
+// include class.secure.php to protect this file and the whole CMS!
+if (defined('WB_PATH')) {
+  if (defined('LEPTON_VERSION'))
+    include(WB_PATH.'/framework/class.secure.php');
+}
+else {
+  $oneback = "../";
+  $root = $oneback;
+  $level = 1;
+  while (($level < 10) && (!file_exists($root.'/framework/class.secure.php'))) {
+    $root .= $oneback;
+    $level += 1;
+  }
+  if (file_exists($root.'/framework/class.secure.php')) {
+    include($root.'/framework/class.secure.php');
+  }
+  else {
+    trigger_error(sprintf("[ <b>%s</b> ] Can't include class.secure.php!", $_SERVER['SCRIPT_NAME']), E_USER_ERROR);
+  }
+}
+// end include class.secure.php
 
 require_once(WB_PATH.'/modules/'.basename(dirname(__FILE__)).'/initialize.php');
 require_once(WB_PATH.'/framework/functions.php');
@@ -28,11 +47,11 @@ if (!is_object($dbPollSorter))		$dbPollSorter = new dbPollTableSort();
 if (!is_object($dbPollCfg))				$dbPollCfg = new dbPollCfg();
 
 class pollBackend {
-	
+
 	const request_action							= 'act';
 	const request_add_answer					= 'aans';
 	const request_items								= 'its';
-	
+
 	const action_about								= 'abt';
 	const action_config								= 'cfg';
 	const action_config_check					= 'cfgc';
@@ -41,31 +60,31 @@ class pollBackend {
 	const action_export								= 'exp';
 	const action_default							= 'def';
 	const action_list									= 'lst';
-	
+
 	private $tab_navigation_array = array(
 		self::action_list								=> poll_tab_list,
 		self::action_edit								=> poll_tab_edit,
 		self::action_config							=> poll_tab_config,
 		self::action_about							=> poll_tab_about
-		
+
 	);
-	
+
 	private $page_link 								= '';
 	private $img_url									= '';
 	private $template_path						= '';
 	private $error										= '';
 	private $message									= '';
-	
+
 	public function __construct() {
 		$this->page_link = ADMIN_URL.'/admintools/tool.php?tool=kit_poll';
 		$this->template_path = WB_PATH . '/modules/' . basename(dirname(__FILE__)) . '/htt/' ;
 		$this->img_url = WB_URL. '/modules/'.basename(dirname(__FILE__)).'/images/';
 		date_default_timezone_set(tool_cfg_time_zone);
 	} // __construct()
-	
+
 	/**
     * Set $this->error to $error
-    * 
+    *
     * @param STR $error
     */
   public function setError($error) {
@@ -76,7 +95,7 @@ class pollBackend {
 
   /**
     * Get Error from $this->error;
-    * 
+    *
     * @return STR $this->error
     */
   public function getError() {
@@ -85,7 +104,7 @@ class pollBackend {
 
   /**
     * Check if $this->error is empty
-    * 
+    *
     * @return BOOL
     */
   public function isError() {
@@ -100,7 +119,7 @@ class pollBackend {
   }
 
   /** Set $this->message to $message
-    * 
+    *
     * @param STR $message
     */
   public function setMessage($message) {
@@ -109,7 +128,7 @@ class pollBackend {
 
   /**
     * Get Message from $this->message;
-    * 
+    *
     * @return STR $this->message
     */
   public function getMessage() {
@@ -118,13 +137,13 @@ class pollBackend {
 
   /**
     * Check if $this->message is empty
-    * 
+    *
     * @return BOOL
     */
   public function isMessage() {
     return (bool) !empty($this->message);
   } // isMessage
-  
+
   /**
    * Return Version of Module
    *
@@ -134,7 +153,7 @@ class pollBackend {
     // read info.php into array
     $info_text = file(WB_PATH.'/modules/'.basename(dirname(__FILE__)).'/info.php');
     if ($info_text == false) {
-      return -1; 
+      return -1;
     }
     // walk through array
     foreach ($info_text as $item) {
@@ -143,30 +162,30 @@ class pollBackend {
         $value = explode('=', $item);
         // return floatval
         return floatval(preg_replace('([\'";,\(\)[:space:][:alpha:]])', '', $value[1]));
-      } 
+      }
     }
     return -1;
   } // getVersion()
-  
+
   public function getTemplate($template, $template_data) {
   	global $parser;
   	try {
-  		$result = $parser->get($this->template_path.$template, $template_data); 
+  		$result = $parser->get($this->template_path.$template, $template_data);
   	} catch (Exception $e) {
   		$this->setError(sprintf(tool_error_template_error, $template, $e->getMessage()));
   		return false;
   	}
   	return $result;
   } // getTemplate()
-  
-  
+
+
   /**
    * Verhindert XSS Cross Site Scripting
-   * 
+   *
    * @param REFERENCE $_REQUEST Array
    * @return $request
    */
-	public function xssPrevent(&$request) { 
+	public function xssPrevent(&$request) {
   	if (is_string($request)) {
 	    $request = html_entity_decode($request);
 	    $request = strip_tags($request);
@@ -175,16 +194,16 @@ class pollBackend {
   	}
 	  return $request;
   } // xssPrevent()
-	
+
   public function action() {
   	$html_allowed = array();
   	foreach ($_REQUEST as $key => $value) {
   		if (!in_array($key, $html_allowed)) {
-  			$_REQUEST[$key] = $this->xssPrevent($value);	  			
-  		} 
+  			$_REQUEST[$key] = $this->xssPrevent($value);
+  		}
   	}
     isset($_REQUEST[self::request_action]) ? $action = $_REQUEST[self::request_action] : $action = self::action_default;
-    
+
   	switch ($action):
   	case self::action_about:
   		$this->show(self::action_about, $this->dlgAbout());
@@ -211,14 +230,14 @@ class pollBackend {
   		break;
   	endswitch;
   } // action
-	
-  	
+
+
   /**
    * Ausgabe des formatierten Ergebnis mit Navigationsleiste
-   * 
+   *
    * @param $action - aktives Navigationselement
    * @param $content - Inhalt
-   * 
+   *
    * @return ECHO RESULT
    */
   public function show($action, $content) {
@@ -238,20 +257,20 @@ class pollBackend {
   	);
   	echo $this->getTemplate('backend.body.htt', $data);
   } // show()
-	
+
   public function dlgAbout() {
   	$data = array(
   		'version'					=> sprintf('%01.2f', $this->getVersion()),
   		'img_url'					=> $this->img_url.'/kit_poll_logo_425x350.jpg',
-  		'release_notes'		=> file_get_contents(WB_PATH.'/modules/'.basename(dirname(__FILE__)).'/info.txt'),
+  		'release_notes'		=> file_get_contents(WB_PATH.'/modules/'.basename(dirname(__FILE__)).'/CHANGELOG'),
   	);
   	return $this->getTemplate('backend.about.htt', $data);
   } // dlgAbout()
-  
+
   public function dlgList() {
   	global $dbPollQuestion;
   	global $dbPollAnswer;
-  	
+
   	$SQL = sprintf( "SELECT * FROM %s WHERE %s!='%s' ORDER BY %s DESC",
   									$dbPollQuestion->getTableName(),
   									dbPollQuestion::field_status,
@@ -263,7 +282,7 @@ class pollBackend {
   		return false;
   	}
   	$items = array();
-  	foreach ($polls as $poll) { 
+  	foreach ($polls as $poll) {
   		$SQL = sprintf( "SELECT SUM(%s) AS antworten FROM %s WHERE %s='%s' AND %s='%s'",
   										dbPollAnswer::field_clicks,
   										$dbPollAnswer->getTableName(),
@@ -271,7 +290,7 @@ class pollBackend {
   										$poll[dbPollQuestion::field_id],
   										dbPollAnswer::field_status,
   										dbPollAnswer::status_active);
-  		$result = array();	
+  		$result = array();
   		if (!$dbPollAnswer->sqlExec($SQL, $result)) {
   			$this->setError(sprintf('[%s - %s] %s', __METHOD__, __LINE__, $dbPollAnswer->getError()));
   			return false;
@@ -290,13 +309,13 @@ class pollBackend {
   			'release'			=> $poll[dbPollQuestion::field_release],
   			'timestamp'		=> $poll[dbPollQuestion::field_timestamp],
   			'clicks'			=> $antworten,
-  			'link_edit'		=> sprintf(	'%s&%s', 
-  																$this->page_link, 
+  			'link_edit'		=> sprintf(	'%s&%s',
+  																$this->page_link,
   																http_build_query(array(	self::request_action => self::action_edit,
   																												dbPollQuestion::field_id => $poll[dbPollQuestion::field_id])))
   		);
   	} // foreach
-  	
+
   	// Kopfzeilen
   	$header = array(
   		'id'					=> poll_th_id,
@@ -308,11 +327,11 @@ class pollBackend {
   		'date_end'		=> poll_th_date_end,
   		'status'			=> poll_th_status,
   		'show_results'=> poll_th_show_results,
-  		'release'			=> poll_th_release, 
+  		'release'			=> poll_th_release,
   		'timestamp'		=> poll_th_timestamp,
   		'clicks'			=> poll_th_clicks
   	);
-  	
+
   	$data = array(
   		'title'				=> poll_header_question_list,
   		'is_intro'		=> $this->isMessage() ? 0 : 1,
@@ -320,18 +339,18 @@ class pollBackend {
   		'polls'				=> $items,
   		'header'			=> $header,
   		'export_link'	=> sprintf('%s&%s=%s', $this->page_link, self::request_action, self::action_export),
-  		'export_text'	=> poll_label_export			
+  		'export_text'	=> poll_label_export
   	);
   	return $this->getTemplate('backend.question.list.htt', $data);
   } // dlgList()
-  
+
   public function dlgEdit() {
   	global $dbPollQuestion;
   	global $dbPollAnswer;
   	global $dbPollSorter;
-  	
+
   	$question_id = (isset($_REQUEST[dbPollQuestion::field_id])) ? $_REQUEST[dbPollQuestion::field_id] : -1;
-  	
+
   	if ($question_id > 0) {
   		// Fragen auslesen
   		$where = array(dbPollQuestion::field_id => $question_id);
@@ -374,7 +393,7 @@ class pollBackend {
   		$answers = array();
   		$answers[] = $dbPollAnswer->getFields();
   	}
-  	
+
   	$poll_answers = array();
   	$add_answers = array();
   	$i=1;
@@ -400,9 +419,9 @@ class pollBackend {
   		);
   		$i++;
   	}
-  	
+
   	$kit_groups = array();
-  	
+
   	$poll = array(
   		'id'					=> array( 'label'		=> poll_label_id,
   														'name'		=> dbPollQuestion::field_id,
@@ -422,7 +441,7 @@ class pollBackend {
   														'hint'		=> poll_hint_page_title),
   		'page_description' => array( 'label' => poll_label_page_description,
   														'name'		=> dbPollQuestion::field_page_description,
-  														'value'		=> $question[dbPollQuestion::field_page_description],	
+  														'value'		=> $question[dbPollQuestion::field_page_description],
   														'hint'		=> poll_hint_page_description),
   		'page_keywords'	=> array('label'	=> poll_label_page_keywords,
   														'name'		=> dbPollQuestion::field_page_keywords,
@@ -441,7 +460,7 @@ class pollBackend {
   														'value'		=> $question[dbPollQuestion::field_question],
   														'hint'		=> poll_hint_question),
   		'access'			=> array( 'label'		=> poll_label_access,
-  														'name'		=> dbPollQuestion::field_access,	
+  														'name'		=> dbPollQuestion::field_access,
   														'active'	=> $question[dbPollQuestion::field_access],
   														'options'	=> $dbPollQuestion->access_array,
   														'hint'		=> poll_hint_access),
@@ -457,7 +476,7 @@ class pollBackend {
   														'name'		=> dbPollQuestion::field_date_end,
   														'value'		=> $question[dbPollQuestion::field_date_end],
   														'hint'		=> poll_hint_date_end),
-  		'status'			=> array( 'label'		=> poll_label_status, 
+  		'status'			=> array( 'label'		=> poll_label_status,
   														'name'		=> dbPollQuestion::field_status,
   														'active'	=> $question[dbPollQuestion::field_status],
   														'options'	=> $dbPollQuestion->status_array,
@@ -480,7 +499,7 @@ class pollBackend {
   		'answers'			=> $poll_answers,
   		'add_answers'	=> $add_answers
   	);
-  	
+
   	$sorter_table = 'mod_kit_poll';
   	$sorter_active = 0;
   	if ($question_id > 0) {
@@ -493,25 +512,25 @@ class pollBackend {
   										$question_id);
   		$sorter = array();
   		if (!$dbPollSorter->sqlExec($SQL, $sorter)) {
-  			$this->setError($dbPollTableSort->getError()); 
+  			$this->setError(sprintf('[%s - %s] %s', __METHOD__, __LINE__, $dbPollSorter->getError()));
   			return false;
-  		} 
+  		}
   		if (count($sorter) < 1) {
   			// Sorter Tabelle anlegen
   			$data = array(
   				dbPollTableSort::field_table => $sorter_table,
   				dbPollTableSort::field_value => $question_id,
   				dbPollTableSort::field_order => ''
-  			); 
+  			);
   			if (!$dbPollSorter->sqlInsertRecord($data)) {
-  				$this->setError($dbPollTableSort->getError()); 
-  				return false;
+  				$this->setError(sprintf('[%s - %s] %s', __METHOD__, __LINE__, $dbPollSorter->getError()));
+  			  return false;
   			}
   		}
   		$sorter_active = 1;
   	}
-  	
-  	
+
+
   	$data = array(
   		'form_action'				=> $this->page_link,
   		'language'					=> (LANGUAGE == 'EN') ? '' : strtolower(LANGUAGE),
@@ -526,16 +545,16 @@ class pollBackend {
   		'poll'							=> $poll,
   		'sorter_table'			=> $sorter_table,
   		'sorter_active'			=> $sorter_active,
-  		'sorter_value'			=> $question_id,  		
+  		'sorter_value'			=> $question_id,
   	);
   	return $this->getTemplate('backend.question.edit.htt', $data);
   } // dlgEdit()
-  
+
   public function checkEdit() {
   	global $dbPollQuestion;
   	global $dbPollAnswer;
   	global $dbPollSorter;
-  	
+
   	// Pflichtfelder: Bezeichner, Frage und mind. 2 Antworten
   	$checked = true;
   	$message = '';
@@ -553,7 +572,7 @@ class pollBackend {
   			break;
   		case dbPollQuestion::field_page_description:
   		case dbPollQuestion::field_page_keywords:
-  		case dbPollQuestion::field_page_title:	
+  		case dbPollQuestion::field_page_title:
   		case dbPollQuestion::field_intro:
   		case dbPollQuestion::field_header:
   			$question[$field] = (isset($_REQUEST[$field])) ? $_REQUEST[$field] : '';
@@ -586,7 +605,7 @@ class pollBackend {
   											dbPollQuestion::status_deleted);
   			$result = array();
   			if (!$dbPollQuestion->sqlExec($SQL, $result)) {
-  				$this->setError(sprintf('[%s - %s] %s', __METHOD__, __LINE__, $dbPollQuestion->getError())); 
+  				$this->setError(sprintf('[%s - %s] %s', __METHOD__, __LINE__, $dbPollQuestion->getError()));
   				return false;
   			}
   			if (count($result) > 0) {
@@ -602,12 +621,12 @@ class pollBackend {
   					$message .= sprintf(poll_msg_question_name_rejected, $name, $result[0][dbPollQuestion::field_id]);
   					unset($_REQUEST[$field]);
   					$checked = false;
-  					break; 
+  					break;
   				}
   			}
-  			$question[$field] = $name;  			
+  			$question[$field] = $name;
   			break;
-  		case dbPollQuestion::field_question: 
+  		case dbPollQuestion::field_question:
   			$question[$field] = (isset($_REQUEST[$field])) ? trim($_REQUEST[$field]) : '';
   			if (empty($question[$field]) || (strlen($question[$field]) < 5)) {
   				$message .= poll_msg_question_empty;
@@ -646,15 +665,15 @@ class pollBackend {
   		case dbPollQuestion::field_id:
   		default:
   			// Feld ueberspringen...
-  			continue;	
+  			continue;
   		endswitch;
-  	}	
-  	
+  	}
+
   	if (!$checked) {
   		$this->setMessage($message);
   		return $this->dlgEdit();
   	}
-  	
+
   	// ok - Datensatz einfuegen oder aktualisieren
   	if ($question_id > 0) {
   		// aktualisieren
@@ -674,7 +693,7 @@ class pollBackend {
   		$message .= poll_msg_question_inserted;
   		$_REQUEST[dbPollQuestion::field_id] = $question_id;
   	}
-  	
+
   	// Antworten pruefen
   	$SQL = sprintf( "SELECT * FROM %s WHERE %s='%s' AND %s='%s'",
   									$dbPollAnswer->getTableName(),
@@ -709,7 +728,7 @@ class pollBackend {
   			}
   		}
   	}
-  	
+
   	// neue Fragen eintragen?
   	for ($i=1; $i<4; $i++) {
   		$is_ans = (isset($_REQUEST[sprintf('%s_%s', self::request_add_answer, $i)])) ? trim($_REQUEST[sprintf('%s_%s', self::request_add_answer, $i)]) : '';
@@ -725,15 +744,15 @@ class pollBackend {
   			}
   		}
   	}
-  	
-  	
+
+
   	$this->setMessage($message);
   	return $this->dlgEdit();
   } // checkEdit()
-  
+
   /**
    * Dialog zur Konfiguration und Anpassung von kitPoll
-   * 
+   *
    * @return STR dialog
    */
   public function dlgConfig() {
@@ -754,7 +773,7 @@ class pollBackend {
 			'value'				=> tool_header_cfg_value,
 			'description'	=> tool_header_cfg_description
 		);
-		
+
 		$items = array();
 		// bestehende Eintraege auflisten
 		foreach ($config as $entry) {
@@ -767,7 +786,7 @@ class pollBackend {
 				'identifier'	=> constant($entry[dbPollCfg::field_label]),
 				'value'				=> $value,
 				'name'				=> sprintf('%s_%s', dbPollCfg::field_value, $id),
-				'description'	=> constant($entry[dbPollCfg::field_description])  
+				'description'	=> constant($entry[dbPollCfg::field_description])
 			);
 		}
 		$data = array(
@@ -776,7 +795,7 @@ class pollBackend {
 			'action_name'					=> self::request_action,
 			'action_value'				=> self::action_config_check,
 			'items_name'					=> self::request_items,
-			'items_value'					=> implode(",", $count), 
+			'items_value'					=> implode(",", $count),
 			'head'								=> tool_header_cfg,
 			'intro'								=> $this->isMessage() ? $this->getMessage() : sprintf(tool_intro_cfg, 'kitMarketPlace'),
 			'is_message'					=> $this->isMessage() ? 1 : 0,
@@ -788,11 +807,11 @@ class pollBackend {
 		);
 		return $this->getTemplate('backend.config.htt', $data);
 	} // dlgConfig()
-	
+
 	/**
 	 * Ueberprueft Aenderungen die im Dialog dlgConfig() vorgenommen wurden
 	 * und aktualisiert die entsprechenden Datensaetze.
-	 * 
+	 *
 	 * @return STR DIALOG dlgConfig()
 	 */
 	public function checkConfig() {
@@ -805,7 +824,7 @@ class pollBackend {
 				if (isset($_REQUEST[dbPollCfg::field_value.'_'.$id])) {
 					$value = $_REQUEST[dbPollCfg::field_value.'_'.$id];
 					$where = array();
-					$where[dbPollCfg::field_id] = $id; 
+					$where[dbPollCfg::field_id] = $id;
 					$config = array();
 					if (!$dbPollCfg->sqlSelectRecord($where, $config)) {
 						$this->setError(sprintf('[%s - %s] %s', __METHOD__, __LINE__, $dbPollCfg->getError()));
@@ -831,17 +850,17 @@ class pollBackend {
 							}
 					}
 				}
-			}		
-		}		
+			}
+		}
 		$this->setMessage($message);
 		return $this->dlgConfig();
 	} // checkConfig()
-  
+
 	public function exportList() {
 		global $dbPollQuestion;
 		global $dbPollAnswer;
 		global $dbPollLog;
-		
+
 		$SQL = sprintf( "SELECT * FROM %s WHERE %s!='%s'",
 										$dbPollQuestion->getTableName(),
 										dbPollQuestion::field_status,
@@ -852,20 +871,20 @@ class pollBackend {
 			return false;
 		}
 		$polls = array();
-		
+
 		$access_array = array(
 			dbPollQuestion::access_kit			=> poll_access_kit,
 			dbPollQuestion::access_public		=> poll_access_public
 		);
-		
+
 		$status_array = array(
 			dbPollQuestion::status_active		=> poll_status_active,
 			dbPollQuestion::status_deleted	=> poll_status_deleted,
 			dbPollQuestion::status_locked		=> poll_status_locked
 		);
-		
+
 		foreach ($questions as $question) {
-			
+
 			$poll = array(
 				poll_th_id				=> $question[dbPollQuestion::field_id],
 				poll_th_name			=> $question[dbPollQuestion::field_name],
@@ -873,7 +892,7 @@ class pollBackend {
 				poll_th_access		=> $access_array[$question[dbPollQuestion::field_access]],
 				poll_th_header		=> $question[dbPollQuestion::field_header],
 				poll_th_intro			=> $question[dbPollQuestion::field_intro],
-				poll_th_question	=> $question[dbPollQuestion::field_question]				
+				poll_th_question	=> $question[dbPollQuestion::field_question]
 			);
 			$SQL = sprintf( "SELECT * FROM %s WHERE %s='%s' AND %s='%s' ORDER BY FIND_IN_SET(%s, '%s')",
 											$dbPollAnswer->getTableName(),
@@ -899,7 +918,7 @@ class pollBackend {
 			$poll[poll_th_clicks_total] = $clicks_total;
 			$polls[] = $poll;
 		}
-		
+
 		$path = WB_PATH.'/media/poll.csv';
 		$fp = fopen($path, 'w');
 		$header = array();
@@ -911,11 +930,11 @@ class pollBackend {
     	fputcsv($fp, $fields, ';');
 		}
 		fclose($fp);
-		
+
 		$this->setMessage(sprintf(poll_msg_poll_csv_export_success, str_replace(WB_PATH, WB_URL, $path)));
 		return $this->dlgList();
 	} // exportList()
-	
+
 } // class pollBackend
 
 ?>

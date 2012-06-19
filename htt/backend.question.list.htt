@@ -1,30 +1,10 @@
 {*
- kitPoll
- 
- @author Ralf Hertsch (ralf.hertsch@phpmanufaktur.de)
- @link http://phpmanufaktur.de
- @copyright 2011
- @license GNU GPL (http://www.gnu.org/licenses/gpl.html)
- @version $Id$
-
- Es stehen folgende Parameter zur Verfügung:
- 
- $poll.id
- $poll.name
- $poll.header
- $poll.question
- $poll.access
- $poll.date_start
- $poll.date_end
- $poll.status
- $poll.show_results
- $poll.release
- $poll.timestamp
- $poll.clicks
- $poll.link_edit
-  			
- Analog dazu stehen die Kopfzeilen $header für die Tabellenüberschriften zur Verfügung.
- 
+ * kitPoll
+ *
+ * @author Ralf Hertsch <ralf.hertsch@phpmanufaktur.de>
+ * @link http://phpmanufaktur.de
+ * @copyright 2011 - 2012
+ * @license MIT License (MIT) http://www.opensource.org/licenses/MIT
 *}
 <h2>{$title}</h2>
 <div class="{if $is_intro==1}intro{else}message{/if}">{$intro}</div>

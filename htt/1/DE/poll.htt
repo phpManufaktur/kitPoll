@@ -1,11 +1,10 @@
 {*
  * kitPoll
  *
- * @author Ralf Hertsch (ralf.hertsch@phpmanufaktur.de)
+ * @author Ralf Hertsch <ralf.hertsch@phpmanufaktur.de>
  * @link http://phpmanufaktur.de
- * @copyright 2011
- * @license GNU GPL (http://www.gnu.org/licenses/gpl.html)
- * @version $Id: backend.config.htt 3 2011-05-05 15:06:12Z phpmanufaktur $
+ * @copyright 2011 - 2012
+ * @license MIT License (MIT) http://www.opensource.org/licenses/MIT
  *}
 <div id="poll_container">
   {if $question.poll_allowed == 1}

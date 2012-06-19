@@ -2,13 +2,13 @@
 
 /**
  * kitPoll
- * 
- * @author Ralf Hertsch (ralf.hertsch@phpmanufaktur.de)
+ *
+ * @author Ralf Hertsch <ralf.hertsch@phpmanufaktur.de>
  * @link http://phpmanufaktur.de
- * @copyright 2011
- * @license GNU GPL (http://www.gnu.org/licenses/gpl.html)
- * @version $Id$
+ * @copyright 2011 - 2012
+ * @license MIT License (MIT) http://www.opensource.org/licenses/MIT
  */
+
 // Mindestparameter gesetzt?
 if (!isset($_POST['rowID']) || !isset($_POST['sorter_table'])) exit();
 // Sorter ausgeschaltet?
@@ -23,7 +23,7 @@ $sorter_table = $_POST['sorter_table'];
 switch ($sorter_table):
 case 'mod_kit_poll':
 	// Frageboegen sortieren
-	$rowIDs = implode(',', $_POST['rowID']); 
+	$rowIDs = implode(',', $_POST['rowID']);
 	$sorter_value = $_POST['sorter_value'];
 	$SQL = sprintf(	"UPDATE %smod_kit_poll_table_sort SET sort_order='%s' WHERE sort_table='%s' AND sort_value='%s'",
 									TABLE_PREFIX, $rowIDs, $sorter_table, $sorter_value);
@@ -37,5 +37,5 @@ case 'mod_kit_poll':
 	break;
 default:
 	echo "no handling defined for: ".$_POST['sorter_table'];
-endswitch;  
+endswitch;
 ?>

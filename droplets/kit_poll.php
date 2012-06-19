@@ -2,12 +2,11 @@
 //:Please visit http://phpManufaktur.de for informations about kitForm!
 /**
  * kitPoll
- * 
- * @author Ralf Hertsch (ralf.hertsch@phpmanufaktur.de)
+ *
+ * @author Ralf Hertsch <ralf.hertsch@phpmanufaktur.de>
  * @link http://phpmanufaktur.de
- * @copyright 2011
- * @license GNU GPL (http://www.gnu.org/licenses/gpl.html)
- * @version $Id: kit_form.php 11 2011-04-13 15:58:46Z phpmanufaktur $
+ * @copyright 2011 - 2012
+ * @license MIT License (MIT) http://www.opensource.org/licenses/MIT
  */
 if (file_exists(WB_PATH.'/modules/kit_poll/class.frontend.php')) {
 	require_once(WB_PATH.'/modules/kit_poll/class.frontend.php');
@@ -15,7 +14,7 @@ if (file_exists(WB_PATH.'/modules/kit_poll/class.frontend.php')) {
 	$params = $poll->getParams();
 	$params[pollFrontend::param_preset] = (isset($preset)) ? (int) $preset : 1;
 	$params[pollFrontend::param_css] = (isset($css) && (strtolower($css) == 'false')) ? false : true;
-	$params[pollFrontend::param_name] = (isset($name)) ? strtolower($name) : ''; 
+	$params[pollFrontend::param_name] = (isset($name)) ? strtolower($name) : '';
 	$params[pollFrontend::param_chart] = (isset($chart)) ? strtolower($chart) : pollFrontend::chart_pie;
 	$params[pollFrontend::param_chart_width] = (isset($chart_width)) ? (int) $chart_width :	300;
 	$params[pollFrontend::param_chart_height] = (isset($chart_height)) ? (int) $chart_height : 300;

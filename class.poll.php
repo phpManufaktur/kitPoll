@@ -1,26 +1,45 @@
 <?php
+
 /**
- * project_name
- * 
- * @author Ralf Hertsch (ralf.hertsch@phpmanufaktur.de)
+ * kitPoll
+ *
+ * @author Ralf Hertsch <ralf.hertsch@phpmanufaktur.de>
  * @link http://phpmanufaktur.de
- * @copyright 2011
- * @license GNU GPL (http://www.gnu.org/licenses/gpl.html)
- * @version $Id$
+ * @copyright 2011 - 2012
+ * @license MIT License (MIT) http://www.opensource.org/licenses/MIT
  */
 
-// prevent this file from being accessed directly
-if (!defined('WB_PATH')) die('invalid call of '.$_SERVER['SCRIPT_NAME']);
+// include class.secure.php to protect this file and the whole CMS!
+if (defined('WB_PATH')) {
+  if (defined('LEPTON_VERSION'))
+    include(WB_PATH.'/framework/class.secure.php');
+}
+else {
+  $oneback = "../";
+  $root = $oneback;
+  $level = 1;
+  while (($level < 10) && (!file_exists($root.'/framework/class.secure.php'))) {
+    $root .= $oneback;
+    $level += 1;
+  }
+  if (file_exists($root.'/framework/class.secure.php')) {
+    include($root.'/framework/class.secure.php');
+  }
+  else {
+    trigger_error(sprintf("[ <b>%s</b> ] Can't include class.secure.php!", $_SERVER['SCRIPT_NAME']), E_USER_ERROR);
+  }
+}
+// end include class.secure.php
 
 class dbPollQuestion extends dbConnectLE {
-	
+
 	const field_id							= 'quest_id';
 	const field_name						= 'quest_name';
 	const field_page_title			= 'quest_page_title';
 	const field_page_description= 'quest_page_desc';
 	const field_page_keywords		= 'quest_page_keys';
 	const field_header					= 'quest_header';
-	const field_intro						= 'quest_intro';  
+	const field_intro						= 'quest_intro';
 	const field_question				= 'quest_question';
 	const field_answers					= 'quest_answers';
 	const field_answers_mode		= 'quest_answers_mode';
@@ -35,30 +54,30 @@ class dbPollQuestion extends dbConnectLE {
 
 	const answers_single				= 1;
 	const answers_multiple			= 2;
-	
+
 	public $answers_array = array(
 		array('key'	=> self::answers_single,	'value' => poll_answers_single),
 		array('key'	=> self::answers_multiple,'value'	=> poll_answers_multiple)
 	);
-	
+
 	const access_public					= 1;
 	const access_kit						= 2;
-	
+
 	public $access_array = array(
 		array('key' => self::access_public, 	'value'	=> poll_access_public),
 		array('key' => self::access_kit, 			'value' => poll_access_kit)
 	);
-	
+
 	const status_active					= 1;
 	const status_locked					= 2;
-	const status_deleted				= 3; 
+	const status_deleted				= 3;
 
 	public $status_array = array(
 		array('key' => self::status_active,		'value'	=> poll_status_active),
 		array('key' => self::status_locked,		'value' => poll_status_locked),
 		array('key' => self::status_deleted,	'value'	=> poll_status_deleted)
 	);
-	
+
 	const show_immediate				= 1; // sofort
 	const show_after_expiration	= 2; // nach Ablauf
 	const show_after_release		= 3; // nach Freigabe
@@ -68,19 +87,19 @@ class dbPollQuestion extends dbConnectLE {
 		array('key' => self::show_after_expiration, 'value'	=> poll_show_expiration),
 		array('key' => self::show_after_release, 'value' => poll_show_release)
 	);
-	
+
 	const release_automatic			= 1;
 	const release_locked				= 2;
 	const release_unlocked			= 3;
-	
+
 	public $release_array = array(
 		array('key' => self::release_automatic, 'value'	=> poll_release_automatic),
 		array('key' => self::release_locked,	'value'	=> poll_release_locked),
 		array('key' => self::release_unlocked,'value'	=> poll_release_unlocked)
 	);
-	
+
 	private $createTables 		= false;
-  
+
   public function __construct($createTables = false) {
   	$this->createTables = $createTables;
   	parent::__construct();
@@ -98,11 +117,11 @@ class dbPollQuestion extends dbConnectLE {
   	$this->addFieldDefinition(self::field_access, "TINYINT NOT NULL DEFAULT '".self::access_public."'");
   	$this->addFieldDefinition(self::field_kit_groups, "VARCHAR(255) NOT NULL DEFAULT ''");
   	$this->addFieldDefinition(self::field_date_start, "DATE NOT NULL DEFAULT '0000-00-00'");
-  	$this->addFieldDefinition(self::field_date_end, "DATE NOT NULL DEFAULT '0000-00-00'");  	
+  	$this->addFieldDefinition(self::field_date_end, "DATE NOT NULL DEFAULT '0000-00-00'");
   	$this->addFieldDefinition(self::field_status, "TINYINT NOT NULL DEFAULT '".self::status_active."'");
   	$this->addFieldDefinition(self::field_show_results, "TINYINT NOT NULL DEFAULT '".self::show_immediate."'");
   	$this->addFieldDefinition(self::field_release, "TINYINT NOT NULL DEFAULT '".self::release_automatic."'");
-  	$this->addFieldDefinition(self::field_timestamp, "TIMESTAMP");	
+  	$this->addFieldDefinition(self::field_timestamp, "TIMESTAMP");
   	$this->checkFieldDefinitions();
   	// Tabelle erstellen
   	if ($this->createTables) {
@@ -113,18 +132,18 @@ class dbPollQuestion extends dbConnectLE {
   		}
   	}
   } // __construct()
-	
+
 } // class dbPollQuestion
 
 class dbPollAnswer extends dbConnectLE {
-	
+
 	const field_id						= 'ans_id';
 	const field_question_id		= 'quest_id';
 	const field_answer				= 'ans_answer';
 	const field_clicks				= 'ans_clicks';
 	const field_status				= 'ans_status';
 	const field_timestamp			= 'ans_timestamp';
-	
+
 	const status_active					= 1;
 	const status_deleted				= 3;
 
@@ -132,9 +151,9 @@ class dbPollAnswer extends dbConnectLE {
 		self::status_active			=> poll_status_active,
 		self::status_deleted		=> poll_status_deleted
 	);
-	
+
 	private $createTables 		= false;
-  
+
   public function __construct($createTables = false) {
   	$this->createTables = $createTables;
   	parent::__construct();
@@ -144,7 +163,7 @@ class dbPollAnswer extends dbConnectLE {
   	$this->addFieldDefinition(self::field_answer, "TEXT NOT NULL DEFAULT ''");
   	$this->addFieldDefinition(self::field_clicks, "INT(11) NOT NULL DEFAULT '0'");
   	$this->addFieldDefinition(self::field_status, "TINYINT NOT NULL DEFAULT '".self::status_active."'");
-  	$this->addFieldDefinition(self::field_timestamp, "TIMESTAMP");	
+  	$this->addFieldDefinition(self::field_timestamp, "TIMESTAMP");
   	$this->setIndexFields(array(self::field_question_id));
   	$this->checkFieldDefinitions();
   	// Tabelle erstellen
@@ -156,19 +175,19 @@ class dbPollAnswer extends dbConnectLE {
   		}
   	}
   } // __construct()
-	
+
 } // class dbPollAnswer
 
 class dbPollLog extends dbConnectLE {
-	
+
 	const field_id							= 'log_id';
 	const field_question_id			= 'quest_id';
 	const field_ip							= 'log_ip';
 	const field_mark						= 'log_mark';
 	const field_timestamp				= 'log_timestamp';
-	
+
 	private $createTables 		= false;
-  
+
   public function __construct($createTables = false) {
   	$this->createTables = $createTables;
   	parent::__construct();
@@ -177,7 +196,7 @@ class dbPollLog extends dbConnectLE {
   	$this->addFieldDefinition(self::field_question_id, "INT(11) NOT NULL DEFAULT '-1'");
   	$this->addFieldDefinition(self::field_ip, "VARCHAR(255) NOT NULL DEFAULT ''");
   	$this->addFieldDefinition(self::field_mark, "VARCHAR(255) NOT NULL DEFAULT ''");
-  	$this->addFieldDefinition(self::field_timestamp, "TIMESTAMP");	
+  	$this->addFieldDefinition(self::field_timestamp, "TIMESTAMP");
   	$this->setIndexFields(array(self::field_question_id));
   	$this->checkFieldDefinitions();
   	// Tabelle erstellen
@@ -189,19 +208,19 @@ class dbPollLog extends dbConnectLE {
   		}
   	}
   } // __construct()
-	
+
 } // class dbPollLog
 
 class dbPollTableSort extends dbConnectLE {
-	
+
 	const field_id				= 'sort_id';
 	const field_table			= 'sort_table';
 	const field_value			= 'sort_value';
 	const field_order			= 'sort_order';
 	const field_timestamp	= 'sort_timestamp';
-	
+
 	private $create_tables = false;
-	
+
 	public function __construct($create_tables=false) {
 		$this->create_tables = $create_tables;
 		parent::__construct();
@@ -220,12 +239,12 @@ class dbPollTableSort extends dbConnectLE {
 				}
 			}
 		}
-	} // __construct()	
-	
+	} // __construct()
+
 } // class dbKITformTableSort
 
 class dbPollCfg extends dbConnectLE {
-	
+
 	const field_id						= 'cfg_id';
 	const field_name					= 'cfg_name';
 	const field_type					= 'cfg_type';
@@ -234,10 +253,10 @@ class dbPollCfg extends dbConnectLE {
 	const field_description		= 'cfg_desc';
 	const field_status				= 'cfg_status';
 	const field_timestamp			= 'cfg_timestamp';
-	
+
 	const status_active				= 1;
 	const status_deleted			= 0;
-	
+
 	const type_undefined			= 0;
 	const type_array					= 7;
   const type_boolean				= 1;
@@ -247,7 +266,7 @@ class dbPollCfg extends dbConnectLE {
   const type_path						= 5;
   const type_string					= 6;
   const type_url						= 8;
-  
+
   public $type_array = array(
   	self::type_undefined		=> '-UNDEFINED-',
   	self::type_array				=> 'ARRAY',
@@ -259,21 +278,21 @@ class dbPollCfg extends dbConnectLE {
   	self::type_string				=> 'STRING',
   	self::type_url					=> 'URL'
   );
-  
+
   private $createTables 		= false;
   private $message					= '';
-    
+
   const cfgPollExec					= 'cfgPollExec';
   const cfgFormDlgLogin			= 'cfgFormDlgLogin';
   const cfgFormDlgAccount		= 'cfgFormDlgAccount';
-  
+
   public $config_array = array(
   	array('poll_label_cfg_exec', self::cfgPollExec, self::type_boolean, '1', 'poll_desc_cfg_exec'),
   	array('poll_label_cfg_form_dlg_login', self::cfgFormDlgLogin, self::type_string, 'kit_login', 'poll_desc_cfg_form_dlg_login'),
   	array('poll_label_cfg_form_dlg_account', self::cfgFormDlgAccount, self::type_string, 'kit_account', 'poll_desc_cfg_form_dlg_account'),
-  );  
-  
-  
+  );
+
+
   public function __construct($createTables = false) {
   	$this->createTables = $createTables;
   	parent::__construct();
@@ -303,14 +322,14 @@ class dbPollCfg extends dbConnectLE {
   	}
   	date_default_timezone_set(tool_cfg_time_zone);
   } // __construct()
-  
+
   public function setMessage($message) {
     $this->message = $message;
   } // setMessage()
 
   /**
     * Get Message from $this->message;
-    * 
+    *
     * @return STR $this->message
     */
   public function getMessage() {
@@ -319,21 +338,21 @@ class dbPollCfg extends dbConnectLE {
 
   /**
     * Check if $this->message is empty
-    * 
+    *
     * @return BOOL
     */
   public function isMessage() {
     return (bool) !empty($this->message);
   } // isMessage
-  
+
   /**
    * Aktualisiert den Wert $new_value des Datensatz $name
-   * 
+   *
    * @param $new_value STR - Wert, der uebernommen werden soll
    * @param $id INT - ID des Datensatz, dessen Wert aktualisiert werden soll
-   * 
+   *
    * @return BOOL Ergebnis
-   * 
+   *
    */
   public function setValueByName($new_value, $name) {
   	$where = array();
@@ -349,7 +368,7 @@ class dbPollCfg extends dbConnectLE {
   	}
   	return $this->setValue($new_value, $config[0][self::field_id]);
   } // setValueByName()
-  
+
   /**
    * Haengt einen Slash an das Ende des uebergebenen Strings
    * wenn das letzte Zeichen noch kein Slash ist
@@ -359,9 +378,9 @@ class dbPollCfg extends dbConnectLE {
    */
   public function addSlash($path) {
   	$path = substr($path, strlen($path)-1, 1) == "/" ? $path : $path."/";
-  	return $path;  
+  	return $path;
   }
-  
+
   /**
    * Wandelt einen String in einen Float Wert um.
    * Geht davon aus, dass Dezimalzahlen mit ',' und nicht mit '.'
@@ -383,7 +402,7 @@ class dbPollCfg extends dbConnectLE {
 		$int = intval($string);
 		return $int;
   }
-  
+
 	/**
 	 * Ueberprueft die uebergebene E-Mail Adresse auf logische Gueltigkeit
 	 *
@@ -396,13 +415,13 @@ class dbPollCfg extends dbConnectLE {
 		else {
 			return false; }
 	}
-  
+
   /**
    * Aktualisiert den Wert $new_value des Datensatz $id
-   * 
+   *
    * @param $new_value STR - Wert, der uebernommen werden soll
    * @param $id INT - ID des Datensatz, dessen Wert aktualisiert werden soll
-   * 
+   *
    * @return BOOL Ergebnis
    */
   public function setValue($new_value, $id) {
@@ -427,7 +446,7 @@ class dbPollCfg extends dbConnectLE {
   		foreach ($worker as $item) {
   			$data[] = trim($item);
   		};
-  		$value = implode(",", $data);  			
+  		$value = implode(",", $data);
   		break;
   	case self::type_boolean:
   		$value = (bool) $new_value;
@@ -439,7 +458,7 @@ class dbPollCfg extends dbConnectLE {
   		}
   		else {
   			$this->setMessage(sprintf(tool_msg_invalid_email, $new_value));
-  			return false;			
+  			return false;
   		}
   		break;
   	case self::type_float:
@@ -466,12 +485,12 @@ class dbPollCfg extends dbConnectLE {
   	}
   	return true;
   } // setValue()
-  
+
   /**
    * Gibt den angeforderten Wert zurueck
-   * 
-   * @param $name - Bezeichner 
-   * 
+   *
+   * @param $name - Bezeichner
+   *
    * @return WERT entsprechend des TYP
    */
   public function getValue($name) {
@@ -513,7 +532,7 @@ class dbPollCfg extends dbConnectLE {
   	endswitch;
   	return $result;
   } // getValue()
-  
+
   public function checkConfig() {
   	foreach ($this->config_array as $item) {
   		$where = array();
@@ -539,7 +558,7 @@ class dbPollCfg extends dbConnectLE {
   	}
   	return true;
   }
-	  
+
 } // class dbPollCfg
 
 
