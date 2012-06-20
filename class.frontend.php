@@ -35,14 +35,11 @@ require_once(WB_PATH.'/modules/'.basename(dirname(__FILE__)).'/initialize.php');
 require_once(WB_PATH.'/include/captcha/captcha.php');
 require_once(WB_PATH.'/modules/kit_form/class.frontend.php');
 
-//require_once(WB_PATH.'/modules/'.basename(dirname(__FILE__)).'/include/pchart/pChart/pData.class');
-//require_once(WB_PATH.'/modules/'.basename(dirname(__FILE__)).'/include/pchart/pChart/pChart.class');
-
 /* pChart library inclusions */
-include(WB_PATH.'/modules/pchart/class/pDraw.class.php');
-include(WB_PATH.'/modules/pchart/class/pImage.class.php');
-include(WB_PATH.'/modules/pchart/class/pData.class.php');
-include(WB_PATH.'/modules/pchart/class/pPie.class.php');
+include(WB_PATH.'/modules/pchart/pchart/class/pDraw.class.php');
+include(WB_PATH.'/modules/pchart/pchart/class/pImage.class.php');
+include(WB_PATH.'/modules/pchart/pchart/class/pData.class.php');
+include(WB_PATH.'/modules/pchart/pchart/class/pPie.class.php');
 
 global $dbPollQuestion;
 global $dbPollAnswer;
@@ -137,7 +134,7 @@ class pollFrontend {
 		$this->page_link = $url;
 		$this->template_path = WB_PATH.'/modules/'.basename(dirname(__FILE__)).'/htt/'.$this->params[self::param_preset].'/'.KIT_POLL_LANGUAGE.'/' ;
 		$this->img_url = WB_URL. '/modules/'.basename(dirname(__FILE__)).'/images/';
-		$this->pchart_path = WB_PATH.'/modules/pchart/';
+		$this->pchart_path = WB_PATH.'/modules/pchart/pchart/';
 		$this->pchart_img_path = WB_PATH.MEDIA_DIRECTORY.'/kit_poll/poll/'.PAGE_ID.'/';
 		$this->pchart_img_url = str_replace(WB_PATH, WB_URL, $this->pchart_img_path);
 		date_default_timezone_set(tool_cfg_time_zone);
