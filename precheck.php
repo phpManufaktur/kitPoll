@@ -33,30 +33,30 @@ else {
 
 // Checking Requirements
 
-$PRECHECK['PHP_VERSION'] = array('VERSION' => '5.2.0', 'OPERATOR' => '>=');
+$PRECHECK['PHP_VERSION'] = array('VERSION' => '5.3.2', 'OPERATOR' => '>=');
 $PRECHECK['WB_ADDONS'] = array(
-	'dbconnect_le'	=> array('VERSION' => '0.64', 'OPERATOR' => '>='),
-	'dwoo' => array('VERSION' => '0.10', 'OPERATOR' => '>='),
-	'droplets' => array('VERSION' => '1.0', 'OPERATOR' => '>='),
-	'droplets_extension' => array('VERSION' => '0.14', 'OPERATOR' => '>='),
-	'kit' => array('VERSION' => '0.38', 'OPERATOR' => '>='),
-	'kit_tools' => array('VERSION' => '0.12', 'OPERATOR' => '>='),
-	'kit_form' => array('VERSION' => '0.14', 'OPERATOR' => '>='),
-	'pchart' => array('VERSION' => '2.1.3', 'OPERATOR' => '>=')
+  'dbconnect_le'	=> array('VERSION' => '0.64', 'OPERATOR' => '>='),
+  'dwoo' => array('VERSION' => '0.10', 'OPERATOR' => '>='),
+  'droplets' => array('VERSION' => '1.0', 'OPERATOR' => '>='),
+  'droplets_extension' => array('VERSION' => '0.14', 'OPERATOR' => '>='),
+  'kit' => array('VERSION' => '0.38', 'OPERATOR' => '>='),
+  'kit_tools' => array('VERSION' => '0.12', 'OPERATOR' => '>='),
+  'kit_form' => array('VERSION' => '0.14', 'OPERATOR' => '>='),
+  'pchart' => array('VERSION' => '2.1.3', 'OPERATOR' => '>=')
 );
 
 global $database;
 $sql = "SELECT `value` FROM `".TABLE_PREFIX."settings` WHERE `name`='default_charset'";
 $result = $database->query($sql);
 if ($result) {
-	$data = $result->fetchRow(MYSQL_ASSOC);
-	$PRECHECK['CUSTOM_CHECKS'] = array(
-		'Default Charset' => array(
-			'REQUIRED' => 'utf-8',
-			'ACTUAL' => $data['value'],
-			'STATUS' => ($data['value'] === 'utf-8')
-		)
-	);
+  $data = $result->fetchRow(MYSQL_ASSOC);
+  $PRECHECK['CUSTOM_CHECKS'] = array(
+    'Default Charset' => array(
+      'REQUIRED' => 'utf-8',
+      'ACTUAL' => $data['value'],
+      'STATUS' => ($data['value'] === 'utf-8')
+    )
+  );
 }
 
 
