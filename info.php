@@ -34,7 +34,7 @@ else {
 $module_directory     = 'kit_poll';
 $module_name          = 'kitPoll';
 $module_function      = 'tool';
-$module_version       = '0.12';
+$module_version       = '0.20';
 $module_status        = 'Beta';
 $module_platform      = '2.8';
 $module_author        = 'Ralf Hertsch, Berlin (Germany)';
