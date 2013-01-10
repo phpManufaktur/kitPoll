@@ -11,10 +11,12 @@
 
 include 'vendor/Autoloader.php';
 
-use phpManufaktur\kitPoll\backend as Backend;
+use phpManufaktur\kitPoll\Backend as Backend;
 
 define('ADDON_PATH', __DIR__);
 define('VENDOR_PATH', __DIR__.'/vendor');
 
 $Tool = new Backend\Tool();
 $Tool->Hello();
+
+

@@ -1,11 +1,13 @@
 <?php
 
-namespace phpmanufaktur\kitPoll\Backend;
+namespace phpManufaktur\kitPoll\Backend;
 
 // need the I18n service
 use Symfony\Component\Translation\Translator;
 use Symfony\Component\Translation\MessageSelector;
 use Symfony\Component\Translation\Loader\ArrayLoader;
+
+use phpManufaktur\kitPoll\Setup;
 
 // require Twig
 require_once VENDOR_PATH.'/Twig/Autoloader.php';
@@ -38,3 +40,6 @@ class Tool {
   }
 } // class Dialog
 
+
+$install = new Setup\Install();
+$install->action();
